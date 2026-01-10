@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>pymech</title>
+    <link rel="stylesheet" href="../../videoPage.css">
+</head>
+<body>
+
+<h1 style="text-align: center;">Time-continuous pendulum</h1>
+<h3 style="text-align: center;"><a href="../../index.html">Back to video list</a></h3>
+
+<div id="displays">
+    <iframe width="768" height="576"
+            src="https://www.youtube.com/embed/g4_IhbgZFqo">
+    </iframe>
+
+    <img src="continuous_time_pendulum.png">
+</div>
+
+<p style="color:red;">NOTE: This simulation was rendered with the below specified alteration(s) to the regular script.<br>- Used continuous-time implementation for rods with fixed length, instead of with Baumgarte stabilization</p>
+
+<h2>Code used for this simulation</h2>
+<pre><code>
+    import pymech as pm
+    import numpy as np
+
+    # ------------------------
+    # PARAMETERS
+    # ------------------------
+    m = 1.0
+    g = 9.81
+    length = 1.5
+    dt = 0.016
+    T = 10
+
+    # ------------------------
+    # SIMULATION
+    # ------------------------
+    sim = pm.Simulation(gravity=g)
+
+    # Fixed anchor
+    anchor = pm.Particle(
+    mass=1.0,
+    pos=(0.0, 0.0),
+    vel=(0.0, 0.0),
+    fixed=True
+    )
+
+    mass = pm.Particle(
+    mass=m,
+    pos=(0.0, -length),
+    vel=(3.0, 0.0)
+    )
+
+    sim.addParticle(anchor)
+    sim.addParticle(mass)
+
+    sim.addRod(pm.Rod(anchor,mass, length=length, stiffness=0.5))
+
+    # ------------------------
+    # RUN
+    # ------------------------
+    states, energies = sim.run(
+    dt=dt,
+    T=T,
+    debug=True,
+    trackEnergy=True,
+    method="Verlet"
+    )
+
+    # ------------------------
+    # VISUALIZE
+    # ------------------------
+    sim.visualize(states, dt, None, energies)
+
+    sim.energyPlot(dt,energies)
+
+</code></pre>
+</body>
+</html>
