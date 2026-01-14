@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>pymech</title>
+    <link rel="stylesheet" href="../../videoPage.css">
+</head>
+<body>
+
+<h1 style="text-align: center;">When stiffness goes wrong</h1>
+<h3 style="text-align: center;"><a href="../../index.html">Back to video list</a></h3>
+
+<div id="displays">
+    <iframe width="768" height="576"
+            src="https://www.youtube.com/embed/C8dZJLfM8tM">
+    </iframe>
+
+    <img src="bad_stiffness.png">
+</div>
+
+<h2>Code used for this simulation</h2>
+<pre><code>
+    import pymech as pm
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # ------------------------
+    # PARAMETERS
+    # ------------------------
+    m = 1.0
+    g = 9.81
+    length = 1.5
+    dt = 0.016
+    T = 10
+    stiff = 10
+
+    # ------------------------
+    # SIMULATION
+    # ------------------------
+    sim = pm.Simulation(gravity=g)
+
+    # Fixed anchor
+    anchor = pm.Particle(
+        mass=1.0,
+        pos=(0.0, 0.0),
+        vel=(0.0, 0.0),
+        fixed=True
+    )
+
+    # First pendulum bob
+    mass1 = pm.Particle(
+        mass=m,
+        pos=(0.0, -length),
+        vel=(-3.0, 0.0)
+    )
+
+    # Second pendulum bob (below the first)
+    mass2 = pm.Particle(
+        mass=m,
+        pos=(0.0, -2*length),
+        vel=(5.0, 0.0)
+    )
+
+    # Add particles to simulation
+    sim.addParticle(anchor)
+    sim.addParticle(mass1)
+    sim.addParticle(mass2)
+
+    # Connect rods
+    sim.addRod(pm.Rod(anchor, mass1, length=length,stiffness=stiff))
+    sim.addRod(pm.Rod(mass1, mass2, length=length,stiffness=stiff))
+
+    # ------------------------
+    # RUN
+    # ------------------------
+    states, energies = sim.run(
+        dt=dt,
+        T=T,
+        debug=True,
+        trackEnergy=True,
+        method="Verlet"
+    )
+
+    # ------------------------
+    # VISUALIZE
+    # ------------------------
+    sim.visualize(states, dt, None, energies)
+
+    sim.energyPlot(dt,energies)
+
+</code></pre>
+</body>
+</html>
